@@ -5,12 +5,12 @@ set -eu -o pipefail
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
 chmod u+x nvim.appimage
 ./nvim.appimage || (
-	./nvim.appimage --appimage-extract
-	./squashfs-root/AppRun --version
+    ./nvim.appimage --appimage-extract
+    ./squashfs-root/AppRun --version
 
-	# Optional: exposing nvim globally.
-	sudo mv squashfs-root /
-	sudo ln -s /squashfs-root/AppRun /usr/bin/nvim
+    # Optional: exposing nvim globally.
+    sudo mv squashfs-root /
+    sudo ln -s /squashfs-root/AppRun /usr/bin/nvim
 )
 
 #sudo apt update
@@ -20,3 +20,9 @@ chmod u+x nvim.appimage
 #cd neovim
 #make CMAKE_BUILD_TYPE=Release
 #sudo make install
+
+echo 'alias vim=nvim' >>"$HOME/.bashrc"
+
+sudo apt-get install ripgrep
+
+npm i -g prettier
