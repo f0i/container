@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+if [ "$#" -lt 1 ]; then
+	echo "Usage: $0 <project> <port_host>[:<port_container>] [<port_host>[:<port_container>]] ..."
+	exit 1
+fi
+
+container=$1-dev-1
+shift
+
+docker exec -itu node -w /workspace $container \
+	bash -c 'sudo service ssh start'
+
+ip=$(docker exec -itu node -w /workspace $container \
+	bash -c 'ip address show scope global | grep inet | sed "s/.*inet.\([0-9.]*\).*/\1/"' | tr -d '[:space:]')
+
+sshCommand=""
+for portMapping in "$@"; do
+	portContainer=${portMapping#*:}
+	portHost=${portMapping%%:*}
+	sshCommand+=" -L $portHost:localhost:$portContainer"
+done
+
+echo " >" ssh $sshCommand "root@$ip"
+ssh $sshCommand "root@$ip" "echo connected; sleep infinity"

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+if [[ $# -eq 0 ]]; then
+	container=$(basename "$PWD")-dev-1
+
+	echo " >" docker exec -itu node -w /workspace "$container" bash
+	docker exec -itu node -w /workspace "$container" bash
+elif [[ "$1" == "help" ]]; then
+	echo "Connect to a development environment inside docker."
+	echo ""
+	echo "$0 [<project>] [build|up|start|stop]"
+	echo ""
+	echo "<project>: name of a project, located in ~/projects/<project>."
+	echo "           Must contain a subdirectory called ./container with a docker-compose configuration"
+	echo ""
+	echo "If called without arguments, the name of the current directory will be used as the <project>"
+	echo "If called with two arguments, the second one will be passed as an argument to docker-compose"
+	exit 1
+elif [[ $# -eq 1 ]]; then
+	container=$1-dev-1
+
+	echo " >" docker exec -itu node -w /workspace "$container" bash
+	docker exec -itu node -w /workspace "$container" bash
+else
+	cd "${HOME}/projects/${1}/container"
+	pwd
+	echo " >" docker-compose -p "$1" $2
+	docker-compose -p "$1" $2
+fi
