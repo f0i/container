@@ -21,10 +21,3 @@ services:
       #  source: /var/run/docker.sock
       #  target: /var/run/docker.sock
     command: /bin/bash -c "echo ready; sleep infinity"
-    #ports:
-    ## ports can be forwarded by `bin/ports <project> 4321 5987`
-    #  - 127.0.0.1:3000:3000
-    #  - 127.0.0.1:4943:4943
-    #  - 127.0.0.1:4321:4321
-    #  #- 127.0.0.1:5987:5987
-    #  - 127.0.0.1:10022:22
