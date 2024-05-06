@@ -4,15 +4,15 @@
 [merge]
 	tool = vimdiff
 [mergetool "vimdiff"]
-  cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+	cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
 [diff]
-  noprefix = true
+	noprefix = true
 [color]
 	status = auto
 	diff = auto
 	branch = auto
-  ui = auto
-  interactive = auto
+	ui = auto
+	interactive = auto
 [push]
 	default = simple
 	followTags = true
@@ -21,31 +21,38 @@
 [log]
 	decorate = short
 [alias]
-  s = status
-  p = diff
-  b = branch
-  l = log --graph --pretty=format:'%C(yellow)%h%C(cyan)%d %C(green)%an %C(cyan)%G?%Creset %s %C(green)%ad - %ar%Creset' --date=iso
+	s = status
+	p = diff
+	b = branch
+	l = log --graph --pretty=format:'%C(yellow)%h%C(cyan)%d %C(green)%an %C(cyan)%G?%Creset %s %C(green)%ad - %ar%Creset' --date=iso
 	la = !git l --all
-  lf = !git l --stat
-  laf = !git la --stat
-  lfa = !git laf
-  lp = !git l --patch
-  lp1 = !git lp -1
-  lp2 = !git lp -2
-  lwp = !git lp --color-words
-  lap = !git la --patch
-  lawp = !git lap --color-word
-  wp = diff --color-words
-  wdiff = diff --color-words
-  ls = ls-files
-  c = commit -v
-  ca = commit -av
-  stas = -c commit.gpgsign=false stash
-  git = !git
-  pwd = rev-parse --show-prefix
+	lf = !git l --stat
+	laf = !git la --stat
+	lfa = !git laf
+	lp = !git l --patch
+	lp1 = !git lp -1
+	lp2 = !git lp -2
+	lwp = !git lp --color-words
+	lap = !git la --patch
+	lawp = !git lap --color-word
+	wp = diff --color-words
+	wdiff = diff --color-words
+	ls = ls-files
+	c = commit -v
+	ca = commit -av
+	stas = -c commit.gpgsign=false stash
+	git = !git
+	pwd = rev-parse --show-prefix
+	sub = submodule
+[gpg]
+	program = gpg2
 [init]
 	defaultBranch = main
 [pull]
 	rebase = false
 [url "https://github.com/"]
 	insteadOf = git://github.com/
+[safe]
+	directory = /etc/nixos
+[submodule]
+	recurse = true
