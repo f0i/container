@@ -10,12 +10,15 @@ fi
 container=$1-dev-1
 shift
 
+# start ssh
 docker exec -itu node -w /workspace $container \
 	bash -c 'sudo service ssh start'
 
+# extract IP address of docker container from via docker cli
 ip=$(docker exec -itu node -w /workspace $container \
 	bash -c 'ip address show scope global | grep inet | sed "s/.*inet.\([0-9.]*\).*/\1/"' | tr -d '[:space:]')
 
+# concatenate all port mappings for local port forwarding (-L)
 sshCommand=""
 for portMapping in "$@"; do
 	portContainer=${portMapping#*:}
@@ -23,5 +26,6 @@ for portMapping in "$@"; do
 	sshCommand+=" -L $portHost:localhost:$portContainer"
 done
 
+# output the ssh command and print "connected" when the connection is established
 echo " >" ssh $sshCommand "root@$ip"
 ssh $sshCommand "root@$ip" "echo connected; sleep infinity"
