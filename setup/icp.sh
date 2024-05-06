@@ -23,6 +23,9 @@ sudo apt-get -y install expect
 # install mops
 npm i -g ic-mops
 
+# instll mo-fmt
+npm install -g mo-fmt
+
 # plantuml
 sudo apt -y install plantuml
 # too old, overwrite with newer version
