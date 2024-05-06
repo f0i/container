@@ -6,11 +6,11 @@ Something similar to [Development Containers](https://containers.dev/) build wit
 
 Requires docker, docker-compose and some basic tools like git, bash, ssh, etc.
 
-The commands `dev` and `path` should be somewhere in your PATH.
+The commands `bin/dev` and `bin/path` should be somewhere in your PATH.
 
 1. Assuming a project called `allkinds` in `~/projects/allkinds`
 2. Clone this repo into the project root `cd ~/projects/allkinds/ ; git clone git@github.com:f0i/container`
-3. Modify the `Dockerfile` to include the serveices and tools you need
+3. Modify the `Dockerfile` to include the services and tools you need
 4. Start the docker container using the `dev` command `dev allkinds start`
 5. Connect to the container `dev allkinds` and start development
 6. Enable port forwarding to the host `ports 3000 8080:80`,
