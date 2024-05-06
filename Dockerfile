@@ -7,8 +7,9 @@ USER node
 
 RUN USER=node /setup/sshd.sh
 RUN /setup/nvim.sh
-RUN USER=node /setup/docker.sh
-RUN /setup/php.sh
-RUN /setup/icp.sh
+#RUN USER=node /setup/docker.sh
+#RUN /setup/php.sh
+#RUN /setup/icp.sh
+RUN /setup/rust.sh
 
 CMD [ "sleep", "20000" ]
