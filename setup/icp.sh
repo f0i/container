@@ -9,13 +9,6 @@ npm install -g npm@10.2.3
 # install dfx
 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 
-# install vessel
-(
-	cd ~/bin/
-	wget https://github.com/dfinity/vessel/releases/download/v0.7.0/vessel-linux64 -O vessel
-	chmod +x vessel
-)
-
 # install expect
 sudo apt-get update
 sudo apt-get -y install expect
