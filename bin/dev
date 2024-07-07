@@ -23,6 +23,14 @@ elif [[ $# -eq 1 ]]; then
 
 	echo " >" docker exec -itu node -w /workspace "$container" bash
 	docker exec -itu node -w /workspace "$container" bash
+elif [[ "$2" == "ports" ]]; then
+	project=$1
+	cd "${HOME}/projects/${1}/container"
+	pwd
+	shift
+	shift
+	echo " > ports $project $*"
+	bin/ports $project $*
 else
 	cd "${HOME}/projects/${1}/container"
 	pwd
