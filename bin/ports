@@ -2,30 +2,31 @@
 
 set -eu -o pipefail
 
-if [ "$#" -lt 1 ]; then
+# check if there is at least one argument
+if [ "$#" -lt 2 ]; then
 	echo "Usage: $0 <project> <port_host>[:<port_container>] [<port_host>[:<port_container>]] ..."
 	exit 1
 fi
 
-container=$1-dev-1
+container="$1-dev-1"
 shift
 
 # start ssh
-docker exec -itu node -w /workspace $container \
+docker exec -itu node -w /workspace "$container" \
 	bash -c 'sudo service ssh start'
 
 # extract IP address of docker container from via docker cli
-ip=$(docker exec -itu node -w /workspace $container \
+ip=$(docker exec -itu node -w /workspace "$container" \
 	bash -c 'ip address show scope global | grep inet | sed "s/.*inet.\([0-9.]*\).*/\1/"' | tr -d '[:space:]')
 
 # concatenate all port mappings for local port forwarding (-L)
-sshCommand=""
+sshArgs=""
 for portMapping in "$@"; do
 	portContainer=${portMapping#*:}
 	portHost=${portMapping%%:*}
-	sshCommand+=" -L $portHost:localhost:$portContainer"
+	sshArgs+=" -L $portHost:localhost:$portContainer"
 done
 
 # output the ssh command and print "connected" when the connection is established
-echo " >" ssh $sshCommand "root@$ip"
-ssh $sshCommand "root@$ip" "echo connected; sleep infinity"
+echo " >" ssh $sshArgs "root@$ip"
+ssh $sshArgs "root@$ip" "echo connected; sleep infinity"

@@ -2,38 +2,142 @@
 
 set -eu -o pipefail
 
-if [[ $# -eq 0 ]]; then
-	container=$(basename "$PWD")-dev-1
+## list of subcommands
+subcommands=("help" "init" "ports" "start" "stop" "up" "build" "run" "bash" "h" "p" "s" "u" "b" "r")
 
-	echo " >" docker exec -itu node -w /workspace "$container" bash
-	docker exec -itu node -w /workspace "$container" bash
-elif [[ "$1" == "help" ]]; then
+project=""
+command="bash"
+
+# function to check if string is a subcommand
+is_subcommand() {
+	[[ " ${subcommands[@]} " =~ " $1 " ]]
+}
+
+## check if any arguments are given
+if [[ $# -eq 0 ]]; then
+	true;
+	# use default settings
+else
+	# check if project is given
+	if is_subcommand "$1"
+	then
+		true;
+	else
+		project="$1"
+		shift
+	fi
+fi
+
+# check if project is set
+if [[ -z "$project" ]]; then
+	# no project given
+	# check if /tmp/dev.last.project exists
+	if [[ -f /tmp/dev.last.project ]]; then
+		project=$(cat /tmp/dev.last.project)
+	fi
+fi
+
+if [[ -z "$project" ]]; then
+		# no project given, no project guessed
+		echo "Couldn't detect project, please provide a project name"
+		exit 1
+	
+fi
+
+# check command
+if [[ $# -eq 0 ]]; then
+	true;
+else
+	if is_subcommand "$1"
+	then
+		command=$1
+		shift
+	else
+		echo "Invalid command: $1"
+		exit 1
+	fi
+fi
+
+# check if project exists in ~/projects
+if [[ ! -d "${HOME}/projects/${project}" ]]; then
+	echo "Project ${project} not found in ~/projects"
+	exit 1
+fi
+
+# check if project has a container directory
+if [[ ! -d "${HOME}/projects/${project}/container" ]]; then
+	echo "Project ${project} has no container directory"
+	exit 1
+fi
+
+# save project name
+echo "${project}" > /tmp/dev.last.project
+
+# change to project directory
+cd "${HOME}/projects/${project}"
+
+container="$project-dev-1"
+
+# function to show usage information
+help ()
+{
 	echo "Connect to a development environment inside docker."
 	echo ""
-	echo "$0 [<project>] [build|up|start|stop]"
+	echo "$0 [<project>] [<command> [args...]]"
 	echo ""
 	echo "<project>: name of a project, located in ~/projects/<project>."
-	echo "           Must contain a subdirectory called ./container with a docker-compose configuration"
+	echo "           Must contain a subdirectory called ./container (see https://github.com/f0i/container)"
+	echo "           If no project is given, the last used project will be used."
 	echo ""
-	echo "If called without arguments, the name of the current directory will be used as the <project>"
-	echo "If called with two arguments, the second one will be passed as an argument to docker-compose"
+	echo "<command>: one of the following commands:"
+	echo "  help: show this help"
+	echo "  ports: show port mappings"
+	echo "  start stop up build: docker-compose commands"
+	echo "  run: run a command inside the container"
+	echo "  bash (default): start a bash shell inside the container"
+	echo "  h p s u b r: shortcuts for help ports start stop up build run"
 	exit 1
-elif [[ $# -eq 1 ]]; then
-	container=$1-dev-1
+}
 
-	echo " >" docker exec -itu node -w /workspace "$container" bash
-	docker exec -itu node -w /workspace "$container" bash
-elif [[ "$2" == "ports" ]]; then
-	project=$1
-	cd "${HOME}/projects/${1}/container"
-	pwd
-	shift
-	shift
-	echo " > ports $project $*"
-	bin/ports $project $*
-else
-	cd "${HOME}/projects/${1}/container"
-	pwd
-	echo " >" docker-compose -p "$1" $2
-	docker-compose -p "$1" $2
-fi
+pwd
+# execute command
+case "$command" in
+	"h"|"help")
+		help
+		;;
+	"p"|"ports")
+		container/bin/ports "$@"
+		;;
+	"s"|"start")
+		docker-compose -p "$project" up -d
+		;;
+	"stop")
+		docker-compose -p "$project" stop
+		;;
+	"up"|"u")
+		docker-compose -p "$project" up
+		;;
+	"build"|"b")
+		docker-compose -p "$project" build
+		;;
+	"run"|"r")
+		docker exec -itu node -w /workspace "$container" "$@"
+		;;
+	"bash")
+		docker exec -itu node -w /workspace "$container" bash
+		;;
+	"init")
+		# confirm init
+	        echo "Init project $project"
+		echo "This will clone the container repository into $HOME/projects/$project/container"
+		echo -n "Press any key to continue or Ctrl-C to cancel"
+		read -n 1 -s
+		echo
+		echo git clone https://github.com/f0i/container
+		;;
+	*)
+		echo "Invalid command: $command"; 
+		exit 1
+		;;
+esac
+
