@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 ## list of subcommands
-subcommands=("help" "init" "ports" "start" "stop" "up" "build" "run" "bash" "h" "p" "s" "u" "b" "r")
+subcommands=("help" "init" "upgrade" "ports" "start" "stop" "up" "build" "run" "bash" "local" "h" "p" "s" "u" "b" "r")
 
 project=""
 command="bash"
@@ -54,7 +54,7 @@ else
 		shift
 	else
 		echo "Invalid command: $1"
-		exit 1
+		exit 2
 	fi
 fi
 
@@ -67,14 +67,26 @@ fi
 # check if project has a container directory
 if [[ ! -d "${HOME}/projects/${project}/container" ]]; then
 	echo "Project ${project} has no container directory"
-	exit 1
+else
+	# check if command is init
+	if [[ "$command" == "init" ]]; then
+		# confirm init
+	        echo "Init project $project"
+		echo "This will clone the container repository into $HOME/projects/$project/container"
+		echo -n "Press any key to continue or Ctrl-C to cancel"
+		read -n 1 -s
+		echo
+		git clone https://github.com/f0i/container
+		exit 0
+	fi
+
 fi
 
 # save project name
 echo "${project}" > /tmp/dev.last.project
 
 # change to project directory
-cd "${HOME}/projects/${project}"
+cd "${HOME}/projects/${project}/container"
 
 container="$project-dev-1"
 
@@ -95,11 +107,14 @@ help ()
 	echo "  start stop up build: docker-compose commands"
 	echo "  run: run a command inside the container"
 	echo "  bash (default): start a bash shell inside the container"
+	echo "  init: add ./container to an existing project"
+	echo "  upgrade: update the container repository"
 	echo "  h p s u b r: shortcuts for help ports start stop up build run"
-	exit 1
 }
 
-pwd
+# enable debugging
+set -x
+
 # execute command
 case "$command" in
 	"h"|"help")
@@ -126,18 +141,24 @@ case "$command" in
 	"bash")
 		docker exec -itu node -w /workspace "$container" bash
 		;;
+	"local")
+		cd ..
+		bash
+		;;
 	"init")
-		# confirm init
-	        echo "Init project $project"
-		echo "This will clone the container repository into $HOME/projects/$project/container"
-		echo -n "Press any key to continue or Ctrl-C to cancel"
-		read -n 1 -s
-		echo
-		echo git clone https://github.com/f0i/container
+		# already handeld above if needed
+		echo "Project $project already initialized"
+		echo "Use $0 upgrade to update the container repository"
+		exit 3
+		;;
+	"upgrade")
+		# git pull and update submodules
+		git pull
+		git submodule update --init --recursive
 		;;
 	*)
 		echo "Invalid command: $command"; 
-		exit 1
+		exit 4
 		;;
 esac
 
