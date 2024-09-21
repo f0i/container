@@ -3,13 +3,28 @@
 set -eu -o pipefail
 
 # check if there is at least one argument
-if [ "$#" -lt 2 ]; then
-	echo "Usage: $0 <project> <port_host>[:<port_container>] [<port_host>[:<port_container>]] ..."
+if [ "$#" -lt 1 ]; then
+	echo "Usage: $0 <project> [<port_host>[:<port_container>]] ..."
 	exit 1
 fi
 
+project="$1"
 container="$1-dev-1"
 shift
+
+# sore or restore ports
+cd "$HOME/projects/$project/container/cache"
+if [ "$#" -eq 0 ]; then
+    if [ ! -f "./ports" ]; then
+        echo "No ports provided and no previous port mappings found for $project."
+        exit 2
+    fi
+    echo "Reusing previous port mappings for $project."
+    set -- $(cat "./ports") # set arguments
+else
+    # Store the current port mappings for this project
+    echo "$@" > "./ports"
+fi
 
 # start ssh
 docker exec -itu node -w /workspace "$container" \
