@@ -103,7 +103,7 @@ help ()
 	echo ""
 	echo "<command>: one of the following commands:"
 	echo "  help: show this help"
-	echo "  ports: show port mappings"
+	echo "  ports: set port mappings"
 	echo "  start stop up build: docker-compose commands"
 	echo "  run: run a command inside the container"
 	echo "  bash (default): start a bash shell inside the container"
