@@ -10,6 +10,6 @@ RUN /setup/nvim.sh
 #RUN USER=node /setup/docker.sh
 #RUN /setup/php.sh
 #RUN /setup/icp.sh
-RUN /setup/rust.sh
+#RUN /setup/rust.sh
 
 CMD [ "sleep", "20000" ]
