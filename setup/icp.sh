@@ -7,7 +7,7 @@ cd /tmp/
 npm install -g npm@10.2.3
 
 # install dfx
-sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
+DFXVM_INIT_YES=true sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 
 # install expect
 sudo apt-get update
