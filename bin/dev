@@ -121,7 +121,7 @@ case "$command" in
 		help
 		;;
 	"p"|"ports")
-		container/bin/ports "$@"
+		bin/ports "$@"
 		;;
 	"s"|"start")
 		docker-compose -p "$project" up -d
